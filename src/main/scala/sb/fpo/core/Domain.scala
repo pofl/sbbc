@@ -1,8 +1,8 @@
 package sb.fpo.core
 
 object Domain {
-  case class QAndA(q: Question, a: List[Answer])
-  case class Question(q: String, user: User)
-  case class Answer(text: String, user: User)
+  case class QAndA(question: Question, answers: List[Answer])
+  case class Question(text: String, author: User)
+  case class Answer(text: String, author: User)
   case class User(name: String)
 }
