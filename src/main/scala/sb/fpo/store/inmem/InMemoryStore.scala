@@ -16,4 +16,6 @@ class InMemoryStore(private val list: Map[Int, QAndA]) extends IStorage {
 
   override def getQuestion(id: Int): Option[QAndA] = list.get(id)
 
+  override def allQuestions(): Seq[QAndA] = list.values.toSeq
+
 }
