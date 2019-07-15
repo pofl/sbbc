@@ -11,17 +11,8 @@ import sb.fpo.core.Domain
 import io.circe.generic.auto._
 import io.circe.syntax._
 
-object Server {
-  object QAndAReply {
-    def fromDomainQandA(qa: Domain.QAndA) = QAndAReply(qa.question.text, qa.question.author.name, qa.answers)
-  }
-  case class QAndAReply(
-    question: String,
-    author: String,
-    answers: Seq[Domain.Answer])
-}
 class Server(db: IStorage) {
-  import Server._
+  import JsonFormats._
 
   lazy val questionRoute: Route =
     pathPrefix("q") {

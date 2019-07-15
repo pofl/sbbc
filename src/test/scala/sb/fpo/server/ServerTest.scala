@@ -9,7 +9,6 @@ import sb.fpo.store.inmem.InMemoryStore
 import scala.collection.mutable.Map
 import io.circe.generic.auto._
 import io.circe.syntax._
-import sb.fpo.server.Server.QAndAReply
 import io.circe.generic.auto._
 import io.circe.syntax._
 
@@ -43,7 +42,7 @@ class ServerTest extends BaseSpec with ScalatestRouteTest {
 
       "return all questions and their responses" in {
         Get("/q") ~> srv.questionRoute ~> check {
-          responseAs[String].trim shouldEqual initMap.values.map(QAndAReply.fromDomainQandA(_)).asJson.toString
+          responseAs[String].trim shouldEqual initMap.values.map(JsonFormats.QAndAReply.fromDomainQandA(_)).asJson.toString
         }
       }
     }
@@ -73,7 +72,7 @@ class ServerTest extends BaseSpec with ScalatestRouteTest {
     "the requested question exists" should {
       "return that question" in {
         Get("/q/1") ~> srv.questionRoute ~> check {
-          responseAs[String].trim shouldEqual Server.QAndAReply.fromDomainQandA(initMap(1)).asJson.toString.trim
+          responseAs[String].trim shouldEqual JsonFormats.Server.QAndAReply.fromDomainQandA(initMap(1)).asJson.toString.trim
         }
       }
     }
