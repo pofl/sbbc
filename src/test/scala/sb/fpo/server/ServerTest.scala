@@ -78,7 +78,7 @@ class ServerTest extends BaseSpec with ScalatestRouteTest {
     val store = InMemoryStore(initQMap, initUMap)
     val srv = new Server(store)
     Post(uri = "/q", content = """{"question": "How did I get here", "poster_id": "1"}""") ~> srv.questionRoute ~> check {
-      status shouldEqual StatusCodes.OK
+      status shouldEqual StatusCodes.Created
     }
   }
 

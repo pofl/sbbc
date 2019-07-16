@@ -29,7 +29,9 @@ class Server(db: IStorage) {
         get {
           complete(getQ(questionId))
         } ~ post {
-          complete("HI")
+          entity(as[String]) { body =>
+            complete(postA(body))
+          }
         }
       }
     }
@@ -45,13 +47,29 @@ class Server(db: IStorage) {
       case Right(err) =>
         val parsedQuestion = err.as[JsonFormats.PostQuestionRequest]
         parsedQuestion match {
+          case Left(err) => HttpResponse(StatusCodes.BadRequest, entity = err.message)
           case Right(q) =>
             val createdIdx = db.postQuestion(q.question, q.poster_id.toInt)
             createdIdx match {
               case None => HttpResponse(StatusCodes.BadRequest, entity = "User doesn't exist")
-              case Some(id) => HttpResponse(StatusCodes.OK, entity = id.toString)
+              case Some(id) => HttpResponse(StatusCodes.Created, entity = id.toString)
             }
+        }
+    }
+  }
+  def postA(payload: String) = {
+    parse(payload) match {
+      case Left(err) => HttpResponse(StatusCodes.BadRequest, entity = err.message)
+      case Right(value) =>
+        val parsedQuestion = value.as[JsonFormats.PostAnswerRequest]
+        parsedQuestion match {
           case Left(err) => HttpResponse(StatusCodes.BadRequest, entity = err.message)
+          case Right(q) =>
+            val result = db.postAnswer(q.question_id, q.text, q.author_id)
+            result match {
+              case Left(err) => HttpResponse(StatusCodes.BadRequest, entity = err)
+              case Right(()) => HttpResponse(StatusCodes.Created)
+            }
         }
     }
   }
