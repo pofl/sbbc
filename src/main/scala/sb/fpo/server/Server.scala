@@ -10,6 +10,7 @@ import sb.fpo.store.IStorage
 import sb.fpo.core.Domain
 import io.circe.generic.auto._
 import io.circe.syntax._
+import io.circe.parser._
 
 class Server(db: IStorage) {
   import JsonFormats._
@@ -20,7 +21,9 @@ class Server(db: IStorage) {
         get {
           complete(getQs)
         } ~ post {
-          complete("HELLO")
+          entity(as[String]) { body =>
+            complete(postQ(body))
+          }
         }
       } ~ path(IntNumber) { questionId =>
         get {
@@ -36,4 +39,20 @@ class Server(db: IStorage) {
     case None => HttpResponse(StatusCodes.NotFound)
   }
   def getQs = db.allQuestions().map(QAndAReply.fromDomainQandA(_)).asJson.toString
+  def postQ(payload: String) = {
+    parse(payload) match {
+      case Left(value) => HttpResponse(StatusCodes.BadRequest, entity = value.message)
+      case Right(err) =>
+        val parsedQuestion = err.as[JsonFormats.PostQuestionRequest]
+        parsedQuestion match {
+          case Right(q) =>
+            val createdIdx = db.postQuestion(q.question, q.poster_id.toInt)
+            createdIdx match {
+              case None => HttpResponse(StatusCodes.BadRequest, entity = "User doesn't exist")
+              case Some(id) => HttpResponse(StatusCodes.OK, entity = id.toString)
+            }
+          case Left(err) => HttpResponse(StatusCodes.BadRequest, entity = err.message)
+        }
+    }
+  }
 }

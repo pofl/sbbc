@@ -11,4 +11,6 @@ object JsonFormats {
     question: String,
     author: String,
     answers: Seq[Domain.Answer])
+
+  case class PostQuestionRequest(question: String, poster_id: String)
 }
