@@ -37,4 +37,18 @@ class InMemoryStore(
     }
   }
 
+  override def postAnswer(questionId: String, answer: String, authorId: String): Either[String, Unit] = {
+    val questionIdx = questionId.toInt
+    val question: Either[String, Domain.QAndA] = questions.get(questionIdx).toRight("Question doesn't exist")
+    val author: Either[String, Domain.User] = users.get(authorId.toInt).toRight("Author doesn't exist")
+    for {
+      q <- question
+      a <- author
+    } yield {
+      val updatedQA: Domain.QAndA = q.copy(answers = q.answers :+ Domain.Answer(answer, a))
+      questions(questionIdx) = updatedQA
+      ()
+    }
+  }
+
 }

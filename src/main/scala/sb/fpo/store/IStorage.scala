@@ -9,4 +9,6 @@ trait IStorage {
 
   /** @return The ID of the created question */
   def postQuestion(question: String, authorID: Int): Option[Int]
+
+  def postAnswer(questionId: String, answer: String, authorId: String): Either[String, Unit]
 }
